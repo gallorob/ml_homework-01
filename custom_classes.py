@@ -13,3 +13,8 @@ class Sample:
             res.append(x)
         return res
 
+    def instructions_as_string(self):
+        modified = []
+        for instruction in self.instructions:
+            modified.append(instruction.replace('[', '').replace(']', '').replace('+', ''))
+        return ' '.join(modified)
