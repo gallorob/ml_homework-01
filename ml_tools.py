@@ -42,5 +42,5 @@ def evaluate_model(x_train, x_test, y_train, y_test, model, toarray):
     conf_mat = confusion_matrix(y_test, y_pred)
     class_report = classification_report(y_test, y_pred)
 
-    return conf_mat, class_report
+    return conf_mat, class_report, y_pred
 

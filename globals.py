@@ -10,6 +10,14 @@ vectorizers = {
     'TF-IDF Vectorizer': TfidfVectorizer
 }
 
+class_colors = {
+    'gcc': 0,
+    'icc': 1,
+    'clang': 2,
+    'L': 0,
+    'H': 1
+}
+
 models = {
     'Bernoulli Naive Bayes': {
         'name': BernoulliNB,
@@ -59,14 +67,66 @@ models = {
             }
         }
     },
-    'Extra-Tree': ExtraTreeClassifier,
-    'Linear SVC': LinearSVC,
-    'SVM with SGD': SGDClassifier,
+    'Extra-Tree': {
+        'name': ExtraTreeClassifier,
+        'parameters': {
+            0: {
+                'criterion': 'gini',
+                'max_depth': None
+            },
+            1: {
+                'criterion': 'entropy',
+                'max_depth': 5
+            }
+        }
+    },
+    'Linear SVC': {
+        'name': LinearSVC,
+        'parameters': {
+            0: {
+                'penalty': 'l2',
+                'loss': 'squared_hinge'
+            },
+            1: {
+                'penalty': 'l1',
+                'loss': 'squared_hinge'
+            }
+        }
+    },
+    'SVM with SGD': {
+        'name': SGDClassifier,
+        'parameters': {
+            0: {
+                'loss': 'hinge',
+                'penalty': 'l2',
+                'learning_rate': 'optimal'
+            },
+            1: {
+                'loss': 'huber',
+                'penalty': 'l1',
+                'learning_rate': 'constant',
+                'eta0': 0.0001,
+                'early_stopping': True
+            },
+            2: {
+                'loss': 'perceptron',
+                'penalty': 'elasticnet',
+                'learning_rate': 'optimal',
+                'early_stopping': True
+            }
+        }
+    },
     'K Neighbors': {
         'name': KNeighborsClassifier,
         'parameters': {
-            'weights': ['uniform', 'distance'],
-            'algorithm': ['kdtree', 'brute']
+            0: {
+                'weights': 'unfiorm',
+                'algorithm': 'kdtrees'
+            },
+            1: {
+                'weights': 'distance',
+                'algorithm': 'brute'
+            }
         }
     }
 }

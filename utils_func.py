@@ -3,8 +3,11 @@ import random
 from datetime import datetime
 
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.tree import plot_tree
 
 from custom_classes import Sample
+from globals import class_colors
 
 
 def read_json(filename, max_n=None):
@@ -50,7 +53,7 @@ def samples_to_dataset(samples, split_instructions=False):
     return dataset
 
 
-def save_results(model_name, hparams, vectorizer, pred, split_data, conf_mat, class_report):
+def save_results(model_name, hparams, vectorizer, pred, split_data, conf_mat, class_report, counter):
     """
     Save the predictions result in a file
     :param model_name: the name of the model
@@ -61,7 +64,7 @@ def save_results(model_name, hparams, vectorizer, pred, split_data, conf_mat, cl
     :param class_report: the classification report
     """
     with open('results.log', 'a') as results:
-        results.write(str.format('Result at {date}:\n\
+        results.write(str.format('Result at {date}-{counter}:\n\
         \n\tModel: {model} with parameters {params};\
         \n\tprediction: {pred};\
         \n\tVectorizer: {vect}\
@@ -69,6 +72,7 @@ def save_results(model_name, hparams, vectorizer, pred, split_data, conf_mat, cl
         \nConfusion matrix:\
         \n{conf_mat}\nClassification report:\n{class_report}\n\n',
                                  date=datetime.now().strftime('%Y-%m-%d'),
+                                 counter=str.zfill(str(counter), 3),
                                  model=model_name,
                                  params=hparams,
                                  pred=pred,
@@ -79,17 +83,56 @@ def save_results(model_name, hparams, vectorizer, pred, split_data, conf_mat, cl
 
 
 def set_object_attributes(object, attributes):
+    """
+    Set the object's attributes dynamically
+    :param object: the object
+    :param attributes: the attributes
+    """
     for k in attributes:
         setattr(object, k, attributes[k])
 
 
-def plotting(dataset):
-    xs = dataset['n_jumps']
-    ys = dataset['length_instructions']
+def plot_and_save(x_test, y_pred, model, title, counter):
+    # plot model if tree
+    if title.find('Tree') != -1:
+        tree_fig = plt.figure(figsize=(8, 8), dpi=80)
+        plot_tree(model, filled=True)
+        plt.title(title)
+        plt.show()
+        tree_fig.savefig('pictures\\tree_plot_{counter}.png'.format(counter=str.zfill(str(counter), 3)))
+    scatter_fig = plt.figure(figsize=(8, 8), dpi=80)
     area = 1
-    colors = dataset['compiler']
-    plt.scatter(xs, ys, s=area, c=colors, alpha=0.5)
-    plt.title('MSI & LI wrt Opt')
-    plt.xlabel('x')
-    plt.ylabel('y')
+    dimensions = len(set(y_pred))
+    pca = PCA(n_components=dimensions).fit(x_test.todense())
+    data = pca.transform(x_test.todense())
+    colors = []
+    for y in y_pred:
+        colors.append(class_colors[y])
+    if dimensions == 3:
+        ax = scatter_fig.add_subplot(111, projection='3d')
+        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=area, c=colors)
+    else:
+        plt.scatter(data[:, 0], data[:, 1], s=area, c=colors)
+    plt.title(title)
+    plt.show()
+    scatter_fig.savefig('pictures\\results_{counter}.png'.format(counter=str.zfill(str(counter), 3)))
+
+
+def plot_dataset(x_test, y_test):
+    pca = PCA(n_components=len(set(y_test))).fit(x_test.todense())
+    data2D = pca.transform(x_test.todense())
+    colors = []
+    compilers = {
+        'gcc': 0,
+        'icc': 1,
+        'clang': 2,
+        'L': 0,
+        'H': 1
+    }
+    for c in y_test:
+        colors.append(compilers[c])
+    #plt.scatter(data2D[:, 0], data2D[:, 1], c=colors)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(data2D[:,0], data2D[:,1], data2D[:,2], c=colors)
     plt.show()
