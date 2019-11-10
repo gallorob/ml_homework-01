@@ -1,4 +1,5 @@
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, HashingVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import BernoulliNB, MultinomialNB, GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -7,7 +8,8 @@ from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 
 vectorizers = {
     'Count Vectorizer': CountVectorizer,
-    'TF-IDF Vectorizer': TfidfVectorizer
+    'TF-IDF Vectorizer': TfidfVectorizer,
+    'Hashing Vectorizer': HashingVectorizer
 }
 
 class_colors = {
@@ -58,7 +60,7 @@ models = {
         'name': DecisionTreeClassifier,
         'parameters': {
             0: {
-                'criterion': 'gini',
+                'criterion': 'entropy',
                 'max_depth': None
             },
             1: {
@@ -85,10 +87,6 @@ models = {
         'parameters': {
             0: {
                 'penalty': 'l2',
-                'loss': 'squared_hinge'
-            },
-            1: {
-                'penalty': 'l1',
                 'loss': 'squared_hinge'
             }
         }
@@ -120,12 +118,19 @@ models = {
         'name': KNeighborsClassifier,
         'parameters': {
             0: {
-                'weights': 'unfiorm',
-                'algorithm': 'kdtrees'
-            },
-            1: {
-                'weights': 'distance',
-                'algorithm': 'brute'
+                'n_neighbors ': 3,
+                'weights': 'uniform',
+                'algorithm': 'ball_tree'
+            }
+        }
+    },
+    'Random Forest': {
+        'name': RandomForestClassifier,
+        'parameters': {
+            0: {
+                'n_estimators': 5,
+                'criterion': 'gini',
+                'max_depth': 5
             }
         }
     }

@@ -93,6 +93,14 @@ def set_object_attributes(object, attributes):
 
 
 def plot_and_save(x_test, y_pred, model, title, counter):
+    """
+    Plot the samples and the model if it's a tree, then save
+    :param x_test: inputs
+    :param y_pred: predictions
+    :param model: the model
+    :param title: graph title
+    :param counter: image counter
+    """
     # plot model if tree
     if title.find('Tree') != -1:
         tree_fig = plt.figure(figsize=(8, 8), dpi=80)
@@ -102,37 +110,13 @@ def plot_and_save(x_test, y_pred, model, title, counter):
         tree_fig.savefig('pictures\\tree_plot_{counter}.png'.format(counter=str.zfill(str(counter), 3)))
     scatter_fig = plt.figure(figsize=(8, 8), dpi=80)
     area = 1
-    dimensions = len(set(y_pred))
+    dimensions = 2
     pca = PCA(n_components=dimensions).fit(x_test.todense())
     data = pca.transform(x_test.todense())
     colors = []
     for y in y_pred:
         colors.append(class_colors[y])
-    if dimensions == 3:
-        ax = scatter_fig.add_subplot(111, projection='3d')
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=area, c=colors)
-    else:
-        plt.scatter(data[:, 0], data[:, 1], s=area, c=colors)
+    plt.scatter(data[:, 0], data[:, 1], s=area, c=colors)
     plt.title(title)
     plt.show()
     scatter_fig.savefig('pictures\\results_{counter}.png'.format(counter=str.zfill(str(counter), 3)))
-
-
-def plot_dataset(x_test, y_test):
-    pca = PCA(n_components=len(set(y_test))).fit(x_test.todense())
-    data2D = pca.transform(x_test.todense())
-    colors = []
-    compilers = {
-        'gcc': 0,
-        'icc': 1,
-        'clang': 2,
-        'L': 0,
-        'H': 1
-    }
-    for c in y_test:
-        colors.append(compilers[c])
-    #plt.scatter(data2D[:, 0], data2D[:, 1], c=colors)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(data2D[:,0], data2D[:,1], data2D[:,2], c=colors)
-    plt.show()
